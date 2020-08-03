@@ -86,6 +86,8 @@ function viewAllRoles() {
 }
 
 function addEmployee() {
+  connection.query("SELECT * FROM role", (err, results) => {
+    if (err) throw err;
   inquirer
     .prompt([
       {
@@ -126,14 +128,17 @@ function addEmployee() {
         },
       );
     });
+  })
 }
 
 function addRole() {
+  connection.query("SELECT * FROM department", (err, results) => {
+    if (err) throw err;
   inquirer
     .prompt([
       {
         name: "employee_role",
-        message: "Enter employee's role:",
+        message: "Enter new role:",
         type: "input"
       },
       {
@@ -151,8 +156,14 @@ function addRole() {
         role: answer.employee_role,
         salary: answer.salary,
         department_id: answer.department_id
+      },
+      function (err, results) {
+        if (err) throw err;
+        console.log(results)
+        initialPrompts();
       })
     })
+  })
 }
 
 function addDepartment() {
