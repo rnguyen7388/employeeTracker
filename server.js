@@ -28,8 +28,7 @@ function initialPrompts() {
         "View All Roles",
         "Add Employee",
         "Add Role",
-        "Remove Employee",
-        "Update Employee Role",
+        "Add Department",
         "EXIT"
       ]
     }
@@ -50,11 +49,8 @@ function initialPrompts() {
       case "Add Role":
         addRole();
         break;
-      case "Remove Employee":
-        removeEmployee();
-        break;
-      case "Update Employee Role":
-        updateEmpRole();
+      case "Add Department":
+        addDepartment();
         break;
       default:
         connection.end();
@@ -101,6 +97,16 @@ function addEmployee() {
         name: "last_name",
         message: "Enter employee's last name:",
         type: "input"
+      },
+      {
+        name: "addRole",
+        message: "Enter role for employee:",
+        type: "input"
+      },
+      {
+      name: "manager_id",
+      message: "Enter if there is a manager id",
+      type: "input"
       }
     ]).then(function(answer) {
       connection.query(
@@ -108,17 +114,64 @@ function addEmployee() {
         {
           first_name: answer.first_name,
           last_name: answer.last_name,
-          role_id: null,
-          manager_id: null
+          role_id: answer.addRole,
+          manager_id: answer.manager_id
         },
         function(err, answer) {
           if (err) {
             throw err;
           }
           console.table(answer);
-          
+          initialPrompts();
         },
       );
-      initialPrompts();
     });
 }
+
+function addRole() {
+  inquirer
+    .prompt([
+      {
+        name: "employee_role",
+        message: "Enter employee's role:",
+        type: "input"
+      },
+      {
+        name: "salary",
+        message: "Enter employee's salary:",
+        type: "input"
+      },
+      {
+        name: "department_id",
+        message: "Choose a department ID for the employee:",
+        type: "input"
+      }
+    ]).then((answer) => {
+      connection.query("INSERT INTO role SET ?", {
+        role: answer.employee_role,
+        salary: answer.salary,
+        department_id: answer.department_id
+      })
+    })
+}
+
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        name: "department",
+        message: "Enter a new department",
+        type: "input"
+      }
+    ]).then(function(answer) {
+      connection.query("INSERT INTO department SET ?", {
+        name: answer.department
+      })
+      connection.query("SELECT * FROM department", function (err, results) {
+        if (err) throw err;
+        console.table(results)
+        initialPrompts();
+      })
+    })
+}
+
