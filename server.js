@@ -83,6 +83,42 @@ function viewDepartment() {
 
 function viewAllRoles() {
   connection.query("SELECT * FROM role", (err, results) => {
-    
+    console.log("\n\n List of all roles: \n");
+    console.log(results);
   })
+  initialPrompts();
+}
+
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        name: "first_name",
+        message: "Enter employee's first name:",
+        type: "input"
+      },
+      {
+        name: "last_name",
+        message: "Enter employee's last name:",
+        type: "input"
+      }
+    ]).then(function(answer) {
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: answer.first_name,
+          last_name: answer.last_name,
+          role_id: null,
+          manager_id: null
+        },
+        function(err, answer) {
+          if (err) {
+            throw err;
+          }
+          console.table(answer);
+          
+        },
+      );
+      initialPrompts();
+    });
 }
